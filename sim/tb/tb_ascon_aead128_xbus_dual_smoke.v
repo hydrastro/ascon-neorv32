@@ -1,11 +1,10 @@
 `timescale 1ns/1ps
 // SPDX-License-Identifier: Apache-2.0
-
 `default_nettype none
 
 module tb_ascon_aead128_xbus_dual_smoke;
-  localparam [31:0] ENC_BASE = 32'hF000_0000;
-  localparam [31:0] DEC_BASE = 32'hF000_0100;
+  localparam [31:0] ENC_BASE  = 32'hF000_0000;
+  localparam [31:0] DEC_BASE  = 32'hF000_0100;
   localparam [31:0] MISS_ADDR = 32'hF000_0200;
 
   localparam [7:0] REG_CTRL      = 8'h00;
@@ -15,11 +14,11 @@ module tb_ascon_aead128_xbus_dual_smoke;
 
   reg         clk;
   reg         rst_n;
-  reg  [31:0] xbus_adr;
-  reg  [31:0] xbus_dat_i;
+  reg [31:0] xbus_adr;
+  reg [31:0] xbus_dat_i;
   wire [31:0] xbus_dat_o;
   reg         xbus_we;
-  reg  [3:0]  xbus_sel;
+  reg [3:0]   xbus_sel;
   reg         xbus_stb;
   reg         xbus_cyc;
   wire        xbus_ack;
@@ -76,15 +75,19 @@ module tb_ascon_aead128_xbus_dual_smoke;
       xbus_sel   = 4'hf;
       xbus_stb   = 1'b1;
       xbus_cyc   = 1'b1;
+
       cycles = 0;
+      @(posedge clk); #1;
       while (!xbus_ack && !xbus_err && cycles < 200) begin
-        @(posedge clk);
         cycles = cycles + 1;
+        @(posedge clk); #1;
       end
+
       if (!xbus_ack || xbus_err) begin
         $display("FAIL xbus write addr=%08x ack=%0d err=%0d", addr, xbus_ack, xbus_err);
         errors = errors + 1;
       end
+
       @(negedge clk);
       xbus_idle();
     end
@@ -102,16 +105,23 @@ module tb_ascon_aead128_xbus_dual_smoke;
       xbus_sel   = 4'hf;
       xbus_stb   = 1'b1;
       xbus_cyc   = 1'b1;
+
       cycles = 0;
+      @(posedge clk); #1;
       while (!xbus_ack && !xbus_err && cycles < 200) begin
-        @(posedge clk);
         cycles = cycles + 1;
+        @(posedge clk); #1;
       end
+
+      // Sample after the clock-edge NBA updates have settled. The xbus wrapper
+      // registers xbus_dat_o on the same edge that asserts xbus_ack_o.
       data = xbus_dat_o;
+
       if (!xbus_ack || xbus_err) begin
         $display("FAIL xbus read addr=%08x ack=%0d err=%0d", addr, xbus_ack, xbus_err);
         errors = errors + 1;
       end
+
       @(negedge clk);
       xbus_idle();
     end
@@ -128,17 +138,33 @@ module tb_ascon_aead128_xbus_dual_smoke;
       xbus_sel   = 4'hf;
       xbus_stb   = 1'b1;
       xbus_cyc   = 1'b1;
+
       cycles = 0;
+      @(posedge clk); #1;
       while (!xbus_err && cycles < 20) begin
-        @(posedge clk);
         cycles = cycles + 1;
+        @(posedge clk); #1;
       end
+
       if (!xbus_err) begin
         $display("FAIL expected xbus miss error addr=%08x", addr);
         errors = errors + 1;
       end
+
       @(negedge clk);
       xbus_idle();
+    end
+  endtask
+
+  task expect_word;
+    input [255:0] label;
+    input [31:0]  got;
+    input [31:0]  exp;
+    begin
+      if (got !== exp) begin
+        $display("FAIL %0s got=%08x exp=%08x", label, got, exp);
+        errors = errors + 1;
+      end
     end
   endtask
 
@@ -148,6 +174,7 @@ module tb_ascon_aead128_xbus_dual_smoke;
     errors = 0;
     rst_n = 1'b0;
     xbus_idle();
+
     repeat (8) @(posedge clk);
     rst_n = 1'b1;
     repeat (4) @(posedge clk);
@@ -162,31 +189,23 @@ module tb_ascon_aead128_xbus_dual_smoke;
     xbus_write(DEC_BASE + REG_MSG_BYTES, 32'd16);
 
     xbus_read(ENC_BASE + REG_AD_BYTES, tmp);
-    if (tmp !== 32'd17) begin
-      $display("FAIL enc AD_BYTES got=%08x", tmp);
-      errors = errors + 1;
-    end
+    expect_word("enc AD_BYTES", tmp, 32'd17);
+
     xbus_read(ENC_BASE + REG_MSG_BYTES, tmp);
-    if (tmp !== 32'd31) begin
-      $display("FAIL enc MSG_BYTES got=%08x", tmp);
-      errors = errors + 1;
-    end
+    expect_word("enc MSG_BYTES", tmp, 32'd31);
+
     xbus_read(DEC_BASE + REG_AD_BYTES, tmp);
-    if (tmp !== 32'd32) begin
-      $display("FAIL dec AD_BYTES got=%08x", tmp);
-      errors = errors + 1;
-    end
+    expect_word("dec AD_BYTES", tmp, 32'd32);
+
     xbus_read(DEC_BASE + REG_MSG_BYTES, tmp);
-    if (tmp !== 32'd16) begin
-      $display("FAIL dec MSG_BYTES got=%08x", tmp);
-      errors = errors + 1;
-    end
+    expect_word("dec MSG_BYTES", tmp, 32'd16);
 
     xbus_read(ENC_BASE + REG_STATUS, tmp);
     if ((tmp & 32'h1) == 32'd0) begin
       $display("FAIL enc STATUS start_ready not set got=%08x", tmp);
       errors = errors + 1;
     end
+
     xbus_read(DEC_BASE + REG_STATUS, tmp);
     if ((tmp & 32'h1) == 32'd0) begin
       $display("FAIL dec STATUS start_ready not set got=%08x", tmp);
@@ -204,7 +223,6 @@ module tb_ascon_aead128_xbus_dual_smoke;
 
     $finish;
   end
-
 endmodule
 
 `default_nettype wire
