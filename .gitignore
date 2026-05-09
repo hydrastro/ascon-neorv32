@@ -1,0 +1,25 @@
+# Build products
+/build/
+
+# Generated/imported simulation vectors copied from ascon-rtl
+/sim/generated/*.vh
+
+# Local paths / Nix / direnv
+/result
+/.direnv/
+/.envrc
+
+# Simulator outputs
+*.vcd
+*.fst
+*.vvp
+
+# Transfer/archive artifacts
+*.patch
+*.zip
+*.tar.gz
+
+# Patch/editor leftovers
+*.rej
+*.orig
+*~
