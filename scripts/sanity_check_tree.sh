@@ -21,6 +21,14 @@ for f in \
   sw/neorv32/README.md \
   doc/phase4_2.md \
   doc/phase4_3.md \
+  boards/tang-nano-9k/README.md \
+  boards/tang-nano-9k/variants/small.mk \
+  boards/tang-nano-9k/variants/medium.mk \
+  boards/tang-nano-9k/variants/fast-if-fits.mk \
+  boards/tang-nano-9k/variants/decrypt-small.mk \
+  hw/neorv32/tang-nano-9k/README.md \
+  hw/neorv32/tang-nano-9k/ascon_xbus_map.vh \
+  doc/phase5_2.md \
   doc/phase5_1.md \
   hw/neorv32/README.md \
   Makefile .gitignore; do

@@ -159,3 +159,34 @@ $(GEN_DIR):
 
 clean:
 	rm -rf $(BUILD_DIR)
+
+# -----------------------------------------------------------------------------
+# Tang Nano 9K board-profile helpers
+# -----------------------------------------------------------------------------
+TANG_VARIANT ?= small
+TANG_VARIANT_FILE := boards/tang-nano-9k/variants/$(TANG_VARIANT).mk
+-include $(TANG_VARIANT_FILE)
+
+.PHONY: board-tangnano9k-info synth-tangnano9k-accel synth-tangnano9k-matrix
+
+board-tangnano9k-info:
+	@test -f "$(TANG_VARIANT_FILE)" || { echo "ERROR: unknown TANG_VARIANT='$(TANG_VARIANT)'"; exit 1; }
+	@echo "Board:              $${BOARD_NAME:-tang-nano-9k}"
+	@echo "Variant:            $(TANG_VARIANT)"
+	@echo "FPGA_DEVICE:        $(FPGA_DEVICE)"
+	@echo "BOARD_CLOCK_HZ:     $(BOARD_CLOCK_HZ)"
+	@echo "ACCEL_TOP:          $(ACCEL_TOP)"
+	@echo "ACCEL_PROFILE_NAME: $(ACCEL_PROFILE_NAME)"
+	@echo "ACCEL_DECRYPT:      $(ACCEL_DECRYPT)"
+	@echo "ACCEL_RPC:          $(ACCEL_RPC)"
+
+synth-tangnano9k-accel: check-core | $(BUILD_DIR)
+	@test -f "$(TANG_VARIANT_FILE)" || { echo "ERROR: unknown TANG_VARIANT='$(TANG_VARIANT)'"; exit 1; }
+	$(YOSYS) -p 'read_verilog -sv $(RTL_FILES); chparam -set DECRYPT $(ACCEL_DECRYPT) ascon_aead128_xbus; chparam -set ROUNDS_PER_CYCLE $(ACCEL_RPC) ascon_aead128_xbus; synth -top ascon_aead128_xbus; stat -top ascon_aead128_xbus' > $(BUILD_DIR)/yosys_tangnano9k_$(TANG_VARIANT)_accel.txt
+	cat $(BUILD_DIR)/yosys_tangnano9k_$(TANG_VARIANT)_accel.txt
+
+synth-tangnano9k-matrix:
+	$(MAKE) TANG_VARIANT=small synth-tangnano9k-accel
+	$(MAKE) TANG_VARIANT=medium synth-tangnano9k-accel
+	$(MAKE) TANG_VARIANT=fast-if-fits synth-tangnano9k-accel
+	$(MAKE) TANG_VARIANT=decrypt-small synth-tangnano9k-accel
