@@ -59,3 +59,6 @@ if [ -d deps/neorv32 ] && [ ! -f deps/neorv32/rtl/core/neorv32_top.vhd ]; then
   echo "ERROR: deps/neorv32 exists but does not look like a NEORV32 checkout" >&2
   exit 1
 fi
+
+[ -f rtl/tangnano9k_ascon_xbus_single.v ] || { echo "ERROR: missing Tang Nano 9K single XBUS wrapper"; exit 1; }
+[ -f sim/tb/tb_tangnano9k_ascon_xbus_single_smoke.v ] || { echo "ERROR: missing Tang Nano 9K single smoke test"; exit 1; }

@@ -206,3 +206,46 @@ synth-tangnano9k-matrix:
 	$(MAKE) TANG_VARIANT=medium synth-tangnano9k-accel
 	$(MAKE) TANG_VARIANT=fast-if-fits synth-tangnano9k-accel
 	$(MAKE) TANG_VARIANT=decrypt-small synth-tangnano9k-accel
+
+# -----------------------------------------------------------------------------
+# Phase 5.4 Tang Nano 9K single-instance scaffold
+# -----------------------------------------------------------------------------
+ASCON_RTL_DIR ?= deps/ascon-rtl
+TANG_RPC ?= 1
+TANG_DECRYPT ?= 0
+
+CORE_RTL ?= \
+  $(ASCON_RTL_DIR)/rtl/ascon_round_comb.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_perm_unrolled.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_stream_fifo.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_block_packer32.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_block_unpacker32.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_aead128_fullblock_enc.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_aead128_enc.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_aead128_enc_ad.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_aead128_dec_ad.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_aead128_enc_ad_buffered.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_aead128_dec_ad_buffered.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_aead128_buffered.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_aead128_mmio32.v
+
+TANG_SINGLE_RTL := rtl/ascon_aead128_xbus.v rtl/tangnano9k_ascon_xbus_single.v
+
+.PHONY: sim-tangnano9k-single-smoke synth-tangnano9k-single-yosys report-yosys-stats
+
+build/tb_tangnano9k_ascon_xbus_single_smoke.vvp: sim/tb/tb_tangnano9k_ascon_xbus_single_smoke.v $(CORE_RTL) $(TANG_SINGLE_RTL)
+	@mkdir -p build sim/generated
+	iverilog -g2005-sv -Isim/generated -I$(ASCON_RTL_DIR)/rtl -Irtl \
+	  -o $@ $^
+
+sim-tangnano9k-single-smoke: build/tb_tangnano9k_ascon_xbus_single_smoke.vvp
+	vvp $<
+
+synth-tangnano9k-single-yosys:
+	@mkdir -p build
+	yosys -p 'read_verilog $(CORE_RTL) $(TANG_SINGLE_RTL); chparam -set ROUNDS_PER_CYCLE $(TANG_RPC) tangnano9k_ascon_xbus_single; chparam -set DECRYPT $(TANG_DECRYPT) tangnano9k_ascon_xbus_single; synth -top tangnano9k_ascon_xbus_single; stat; check' \
+	  > build/yosys_tangnano9k_single_dec$(TANG_DECRYPT)_rpc$(TANG_RPC).txt
+	cat build/yosys_tangnano9k_single_dec$(TANG_DECRYPT)_rpc$(TANG_RPC).txt
+
+report-yosys-stats:
+	scripts/report_yosys_stats.sh
