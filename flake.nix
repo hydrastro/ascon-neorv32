@@ -18,6 +18,10 @@
             yosys
             python3
           ];
+
+          shellHook = ''
+            export ASCON_RTL_DIR="$PWD/deps/ascon-rtl"
+          '';
         };
       });
     };

@@ -8,12 +8,20 @@ This repository intentionally contains only NEORV32-facing code:
 - `sim/tb/tb_ascon_aead128_xbus.v` — XBUS wrapper regression test.
 - `sw/neorv32/` — C driver and demo code.
 
-The reusable cryptographic RTL lives in the sibling `ascon-rtl` repository. For local development, keep both repos side by side:
+The reusable cryptographic RTL is expected as a pinned Git submodule at `deps/ascon-rtl`:
 
 ```text
-wscon/
-  ascon-rtl/
-  ascon-neorv32/
+ascon-neorv32/
+  deps/ascon-rtl/
+  rtl/
+  sim/
+  sw/
+```
+
+After cloning, initialize the dependency:
+
+```sh
+git submodule update --init --recursive
 ```
 
 Then run:
@@ -25,8 +33,10 @@ make lint-verilator
 make sw-host-check
 ```
 
-If the core repo is somewhere else, set:
+For local experiments, you can still override the core path:
 
 ```sh
 make ASCON_RTL_DIR=/path/to/ascon-rtl sim
 ```
+
+The committed/default build should use the submodule path so that the NEORV32 integration is pinned to an exact `ascon-rtl` revision.

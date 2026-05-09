@@ -6,7 +6,7 @@ VERILATOR ?= verilator
 YOSYS     ?= yosys
 CC        ?= cc
 
-ASCON_RTL_DIR ?= ../ascon-rtl
+ASCON_RTL_DIR ?= deps/ascon-rtl
 BUILD_DIR := build
 GEN_DIR   := sim/generated
 RTL_DIR   := rtl
@@ -39,7 +39,7 @@ IVFLAGS := -g2005-sv -I$(GEN_DIR) -I$(ASCON_RTL_DIR)/rtl -I$(RTL_DIR)
 	vectors lint-verilator synth-xbus-yosys \
 	synth-xbus-enc-rpc1 synth-xbus-enc-rpc2 synth-xbus-enc-rpc4 synth-xbus-enc-rpc8 \
 	synth-xbus-dec-rpc1 synth-xbus-dec-rpc2 synth-xbus-dec-rpc4 synth-xbus-dec-rpc8 \
-	sw-host-check sanity clean
+	sw-host-check sanity check-core clean
 
 all: sim
 
@@ -48,9 +48,19 @@ sim: sim-xbus-iverilog
 sanity:
 	./scripts/sanity_check_tree.sh
 
-vectors: $(VEC_AEAD_AD_FILE)
+check-core:
+	@if [ ! -f "$(ASCON_RTL_DIR)/Makefile" ]; then \
+		echo "ERROR: ASCON_RTL_DIR='$(ASCON_RTL_DIR)' does not look like an ascon-rtl checkout."; \
+		echo "If using the default layout, run:"; \
+		echo "  git submodule update --init --recursive"; \
+		echo "Or override with:"; \
+		echo "  make ASCON_RTL_DIR=/path/to/ascon-rtl <target>"; \
+		exit 1; \
+	fi
 
-$(VEC_AEAD_AD_FILE): | $(GEN_DIR)
+vectors: check-core $(VEC_AEAD_AD_FILE)
+
+$(VEC_AEAD_AD_FILE): check-core | $(GEN_DIR)
 	$(MAKE) -C $(ASCON_RTL_DIR) vectors-ascon-c
 	cp $(ASCON_RTL_DIR)/sim/generated/ascon_aead128_ad_vectors.vh $@
 

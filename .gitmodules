@@ -1,0 +1,3 @@
+[submodule "deps/ascon-rtl"]
+	path = deps/ascon-rtl
+	url = https://github.com/hydrastro/ascon-rtl.git

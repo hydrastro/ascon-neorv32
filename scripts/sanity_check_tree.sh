@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ASCON_RTL_DIR="${ASCON_RTL_DIR:-deps/ascon-rtl}"
+
 bad_files=$(find . \( -name '*.rej' -o -name '*.orig' \) -print)
 if [ -n "$bad_files" ]; then
   echo "ERROR: found stale patch files:"
@@ -29,5 +31,12 @@ fi
 
 grep -q '^/build/' .gitignore || { echo "ERROR: .gitignore must ignore /build/"; exit 1; }
 grep -q '^/sim/generated/\*.vh' .gitignore || { echo "ERROR: .gitignore must ignore generated vectors"; exit 1; }
+
+if [ ! -f "$ASCON_RTL_DIR/rtl/ascon_aead128_mmio32.v" ]; then
+  echo "ERROR: ascon-rtl dependency not found at ASCON_RTL_DIR='$ASCON_RTL_DIR'"
+  echo "If using the default submodule layout, run:"
+  echo "  git submodule update --init --recursive"
+  exit 1
+fi
 
 echo "Sanity check passed: clean ascon-neorv32 tree."
