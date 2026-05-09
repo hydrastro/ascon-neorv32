@@ -5,7 +5,7 @@ NEORV32_DIR="${NEORV32_DIR:-deps/neorv32}"
 
 if [ ! -d "$NEORV32_DIR" ]; then
   echo "ERROR: NEORV32 dependency directory not found: $NEORV32_DIR" >&2
-  echo "Hint: git submodule add https://github.com/stnolting/neorv32.git deps/neorv32" >&2
+  echo "Hint: git submodule update --init --recursive" >&2
   exit 1
 fi
 
@@ -23,6 +23,7 @@ for f in "${required[@]}"; do
 done
 
 printf 'NEORV32 dependency OK: %s\n' "$NEORV32_DIR"
+
 if git -C "$NEORV32_DIR" rev-parse --short HEAD >/dev/null 2>&1; then
   printf 'NEORV32 revision: %s\n' "$(git -C "$NEORV32_DIR" rev-parse --short HEAD)"
 fi

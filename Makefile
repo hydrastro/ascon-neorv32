@@ -1,51 +1,55 @@
 # SPDX-License-Identifier: Apache-2.0
 
-IVERILOG  ?= iverilog
-VVP       ?= vvp
+IVERILOG ?= iverilog
+VVP      ?= vvp
 VERILATOR ?= verilator
-YOSYS     ?= yosys
-CC        ?= cc
+YOSYS    ?= yosys
+CC       ?= cc
 
 ASCON_RTL_DIR ?= deps/ascon-rtl
 BUILD_DIR := build
-GEN_DIR   := sim/generated
-RTL_DIR   := rtl
-TB_DIR    := sim/tb
-SW_DIR    := sw/neorv32
+GEN_DIR := sim/generated
+RTL_DIR := rtl
+TB_DIR := sim/tb
+SW_DIR := sw/neorv32
 
 CORE_RTL_FILES := \
-	$(ASCON_RTL_DIR)/rtl/ascon_round_comb.v \
-	$(ASCON_RTL_DIR)/rtl/ascon_perm_unrolled.v \
-	$(ASCON_RTL_DIR)/rtl/ascon_stream_fifo.v \
-	$(ASCON_RTL_DIR)/rtl/ascon_block_packer32.v \
-	$(ASCON_RTL_DIR)/rtl/ascon_block_unpacker32.v \
-	$(ASCON_RTL_DIR)/rtl/ascon_aead128_fullblock_enc.v \
-	$(ASCON_RTL_DIR)/rtl/ascon_aead128_enc.v \
-	$(ASCON_RTL_DIR)/rtl/ascon_aead128_enc_ad.v \
-	$(ASCON_RTL_DIR)/rtl/ascon_aead128_dec_ad.v \
-	$(ASCON_RTL_DIR)/rtl/ascon_aead128_enc_ad_buffered.v \
-	$(ASCON_RTL_DIR)/rtl/ascon_aead128_dec_ad_buffered.v \
-	$(ASCON_RTL_DIR)/rtl/ascon_aead128_buffered.v \
-	$(ASCON_RTL_DIR)/rtl/ascon_aead128_mmio32.v
+  $(ASCON_RTL_DIR)/rtl/ascon_round_comb.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_perm_unrolled.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_stream_fifo.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_block_packer32.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_block_unpacker32.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_aead128_fullblock_enc.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_aead128_enc.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_aead128_enc_ad.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_aead128_dec_ad.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_aead128_enc_ad_buffered.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_aead128_dec_ad_buffered.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_aead128_buffered.v \
+  $(ASCON_RTL_DIR)/rtl/ascon_aead128_mmio32.v
 
 NEORV32_RTL_FILES := \
-	$(RTL_DIR)/ascon_aead128_xbus.v \
-	$(RTL_DIR)/ascon_aead128_xbus_dual.v
+  $(RTL_DIR)/ascon_aead128_xbus.v \
+  $(RTL_DIR)/ascon_aead128_xbus_dual.v
 
 RTL_FILES := $(CORE_RTL_FILES) $(NEORV32_RTL_FILES)
+
 TB_XBUS_FILE := $(TB_DIR)/tb_ascon_aead128_xbus.v
 TB_XBUS_DUAL_FILE := $(TB_DIR)/tb_ascon_aead128_xbus_dual_smoke.v
 VEC_AEAD_AD_FILE := $(GEN_DIR)/ascon_aead128_ad_vectors.vh
+
 IVFLAGS := -g2005-sv -I$(GEN_DIR) -I$(ASCON_RTL_DIR)/rtl -I$(RTL_DIR)
 
 .PHONY: all sim sim-xbus-iverilog \
-	sim-xbus-enc-rpc1 sim-xbus-enc-rpc2 sim-xbus-enc-rpc4 sim-xbus-enc-rpc8 \
-	sim-xbus-dec-rpc1 sim-xbus-dec-rpc2 sim-xbus-dec-rpc4 sim-xbus-dec-rpc8 \
-	sim-xbus-dual-smoke \
-	vectors lint-verilator synth-xbus-yosys synth-xbus-dual-yosys \
-	synth-xbus-enc-rpc1 synth-xbus-enc-rpc2 synth-xbus-enc-rpc4 synth-xbus-enc-rpc8 \
-	synth-xbus-dec-rpc1 synth-xbus-dec-rpc2 synth-xbus-dec-rpc4 synth-xbus-dec-rpc8 \
-	sw-host-check sanity check-core clean
+  sim-xbus-enc-rpc1 sim-xbus-enc-rpc2 sim-xbus-enc-rpc4 sim-xbus-enc-rpc8 \
+  sim-xbus-dec-rpc1 sim-xbus-dec-rpc2 sim-xbus-dec-rpc4 sim-xbus-dec-rpc8 \
+  sim-xbus-dual-smoke \
+  vectors lint-verilator synth-xbus-yosys synth-xbus-dual-yosys \
+  synth-xbus-enc-rpc1 synth-xbus-enc-rpc2 synth-xbus-enc-rpc4 synth-xbus-enc-rpc8 \
+  synth-xbus-dec-rpc1 synth-xbus-dec-rpc2 synth-xbus-dec-rpc4 synth-xbus-dec-rpc8 \
+  sw-host-check sanity check-core clean \
+  board-tangnano9k-info synth-tangnano9k-accel synth-tangnano9k-matrix \
+  board-tangnano9k-neorv32-info
 
 all: sim
 
@@ -56,12 +60,12 @@ sanity:
 
 check-core:
 	@if [ ! -f "$(ASCON_RTL_DIR)/Makefile" ]; then \
-		echo "ERROR: ASCON_RTL_DIR='$(ASCON_RTL_DIR)' does not look like an ascon-rtl checkout."; \
-		echo "If using the default layout, run:"; \
-		echo "  git submodule update --init --recursive"; \
-		echo "Or override with:"; \
-		echo "  make ASCON_RTL_DIR=/path/to/ascon-rtl <target>"; \
-		exit 1; \
+	  echo "ERROR: ASCON_RTL_DIR='$(ASCON_RTL_DIR)' does not look like an ascon-rtl checkout."; \
+	  echo "If using the default layout, run:"; \
+	  echo "  git submodule update --init --recursive"; \
+	  echo "Or override with:"; \
+	  echo "  make ASCON_RTL_DIR=/path/to/ascon-rtl"; \
+	  exit 1; \
 	fi
 
 vectors: check-core $(VEC_AEAD_AD_FILE)
@@ -70,7 +74,8 @@ $(VEC_AEAD_AD_FILE): check-core | $(GEN_DIR)
 	$(MAKE) -C $(ASCON_RTL_DIR) vectors-ascon-c
 	cp $(ASCON_RTL_DIR)/sim/generated/ascon_aead128_ad_vectors.vh $@
 
-sim-xbus-iverilog: sim-xbus-enc-rpc1 sim-xbus-enc-rpc2 sim-xbus-enc-rpc4 sim-xbus-enc-rpc8 sim-xbus-dec-rpc1 sim-xbus-dec-rpc2 sim-xbus-dec-rpc4 sim-xbus-dec-rpc8
+sim-xbus-iverilog: sim-xbus-enc-rpc1 sim-xbus-enc-rpc2 sim-xbus-enc-rpc4 sim-xbus-enc-rpc8 \
+                   sim-xbus-dec-rpc1 sim-xbus-dec-rpc2 sim-xbus-dec-rpc4 sim-xbus-dec-rpc8
 
 sim-xbus-dual-smoke: $(BUILD_DIR)/tb_ascon_aead128_xbus_dual_smoke.vvp
 	$(VVP) $<
@@ -83,6 +88,7 @@ sim-xbus-enc-rpc4: $(BUILD_DIR)/tb_ascon_aead128_xbus_enc_rpc4.vvp
 	$(VVP) $<
 sim-xbus-enc-rpc8: $(BUILD_DIR)/tb_ascon_aead128_xbus_enc_rpc8.vvp
 	$(VVP) $<
+
 sim-xbus-dec-rpc1: $(BUILD_DIR)/tb_ascon_aead128_xbus_dec_rpc1.vvp
 	$(VVP) $<
 sim-xbus-dec-rpc2: $(BUILD_DIR)/tb_ascon_aead128_xbus_dec_rpc2.vvp
@@ -100,6 +106,7 @@ $(BUILD_DIR)/tb_ascon_aead128_xbus_enc_rpc4.vvp: $(RTL_FILES) $(TB_XBUS_FILE) $(
 	$(IVERILOG) $(IVFLAGS) -P tb_ascon_aead128_xbus.DECRYPT=0 -P tb_ascon_aead128_xbus.RPC=4 -o $@ $(TB_XBUS_FILE) $(RTL_FILES)
 $(BUILD_DIR)/tb_ascon_aead128_xbus_enc_rpc8.vvp: $(RTL_FILES) $(TB_XBUS_FILE) $(VEC_AEAD_AD_FILE) | $(BUILD_DIR)
 	$(IVERILOG) $(IVFLAGS) -P tb_ascon_aead128_xbus.DECRYPT=0 -P tb_ascon_aead128_xbus.RPC=8 -o $@ $(TB_XBUS_FILE) $(RTL_FILES)
+
 $(BUILD_DIR)/tb_ascon_aead128_xbus_dec_rpc1.vvp: $(RTL_FILES) $(TB_XBUS_FILE) $(VEC_AEAD_AD_FILE) | $(BUILD_DIR)
 	$(IVERILOG) $(IVFLAGS) -P tb_ascon_aead128_xbus.DECRYPT=1 -P tb_ascon_aead128_xbus.RPC=1 -o $@ $(TB_XBUS_FILE) $(RTL_FILES)
 $(BUILD_DIR)/tb_ascon_aead128_xbus_dec_rpc2.vvp: $(RTL_FILES) $(TB_XBUS_FILE) $(VEC_AEAD_AD_FILE) | $(BUILD_DIR)
@@ -116,7 +123,8 @@ lint-verilator:
 	$(VERILATOR) --lint-only --timing -Wall -I$(GEN_DIR) -I$(ASCON_RTL_DIR)/rtl -I$(RTL_DIR) --top-module ascon_aead128_xbus $(RTL_FILES)
 	$(VERILATOR) --lint-only --timing -Wall -I$(GEN_DIR) -I$(ASCON_RTL_DIR)/rtl -I$(RTL_DIR) --top-module ascon_aead128_xbus_dual $(RTL_FILES)
 
-synth-xbus-yosys: synth-xbus-enc-rpc1 synth-xbus-enc-rpc2 synth-xbus-enc-rpc4 synth-xbus-enc-rpc8 synth-xbus-dec-rpc1 synth-xbus-dec-rpc2 synth-xbus-dec-rpc4 synth-xbus-dec-rpc8 synth-xbus-dual-yosys
+synth-xbus-yosys: synth-xbus-enc-rpc1 synth-xbus-enc-rpc2 synth-xbus-enc-rpc4 synth-xbus-enc-rpc8 \
+                  synth-xbus-dec-rpc1 synth-xbus-dec-rpc2 synth-xbus-dec-rpc4 synth-xbus-dec-rpc8
 
 synth-xbus-enc-rpc1: | $(BUILD_DIR)
 	$(YOSYS) -p 'read_verilog -sv $(RTL_FILES); chparam -set DECRYPT 0 ascon_aead128_xbus; chparam -set ROUNDS_PER_CYCLE 1 ascon_aead128_xbus; synth -top ascon_aead128_xbus; stat -top ascon_aead128_xbus' > $(BUILD_DIR)/yosys_xbus_enc_stat_rpc1.txt
@@ -130,6 +138,7 @@ synth-xbus-enc-rpc4: | $(BUILD_DIR)
 synth-xbus-enc-rpc8: | $(BUILD_DIR)
 	$(YOSYS) -p 'read_verilog -sv $(RTL_FILES); chparam -set DECRYPT 0 ascon_aead128_xbus; chparam -set ROUNDS_PER_CYCLE 8 ascon_aead128_xbus; synth -top ascon_aead128_xbus; stat -top ascon_aead128_xbus' > $(BUILD_DIR)/yosys_xbus_enc_stat_rpc8.txt
 	cat $(BUILD_DIR)/yosys_xbus_enc_stat_rpc8.txt
+
 synth-xbus-dec-rpc1: | $(BUILD_DIR)
 	$(YOSYS) -p 'read_verilog -sv $(RTL_FILES); chparam -set DECRYPT 1 ascon_aead128_xbus; chparam -set ROUNDS_PER_CYCLE 1 ascon_aead128_xbus; synth -top ascon_aead128_xbus; stat -top ascon_aead128_xbus' > $(BUILD_DIR)/yosys_xbus_dec_stat_rpc1.txt
 	cat $(BUILD_DIR)/yosys_xbus_dec_stat_rpc1.txt
@@ -163,22 +172,21 @@ clean:
 # -----------------------------------------------------------------------------
 # Tang Nano 9K board-profile helpers
 # -----------------------------------------------------------------------------
+
 TANG_VARIANT ?= small
 TANG_VARIANT_FILE := boards/tang-nano-9k/variants/$(TANG_VARIANT).mk
 -include $(TANG_VARIANT_FILE)
 
-.PHONY: board-tangnano9k-info synth-tangnano9k-accel synth-tangnano9k-matrix
-
 board-tangnano9k-info:
 	@test -f "$(TANG_VARIANT_FILE)" || { echo "ERROR: unknown TANG_VARIANT='$(TANG_VARIANT)'"; exit 1; }
-	@echo "Board:              $${BOARD_NAME:-tang-nano-9k}"
-	@echo "Variant:            $(TANG_VARIANT)"
-	@echo "FPGA_DEVICE:        $(FPGA_DEVICE)"
-	@echo "BOARD_CLOCK_HZ:     $(BOARD_CLOCK_HZ)"
-	@echo "ACCEL_TOP:          $(ACCEL_TOP)"
+	@echo "Board: $${BOARD_NAME:-tang-nano-9k}"
+	@echo "Variant: $(TANG_VARIANT)"
+	@echo "FPGA_DEVICE: $(FPGA_DEVICE)"
+	@echo "BOARD_CLOCK_HZ: $(BOARD_CLOCK_HZ)"
+	@echo "ACCEL_TOP: $(ACCEL_TOP)"
 	@echo "ACCEL_PROFILE_NAME: $(ACCEL_PROFILE_NAME)"
-	@echo "ACCEL_DECRYPT:      $(ACCEL_DECRYPT)"
-	@echo "ACCEL_RPC:          $(ACCEL_RPC)"
+	@echo "ACCEL_DECRYPT: $(ACCEL_DECRYPT)"
+	@echo "ACCEL_RPC: $(ACCEL_RPC)"
 
 synth-tangnano9k-accel: check-core | $(BUILD_DIR)
 	@test -f "$(TANG_VARIANT_FILE)" || { echo "ERROR: unknown TANG_VARIANT='$(TANG_VARIANT)'"; exit 1; }
@@ -191,26 +199,9 @@ synth-tangnano9k-matrix:
 	$(MAKE) TANG_VARIANT=fast-if-fits synth-tangnano9k-accel
 	$(MAKE) TANG_VARIANT=decrypt-small synth-tangnano9k-accel
 
-# -----------------------------------------------------------------------------
-# PHASE 5.3 NEORV32 SOURCE SCAFFOLD
-# -----------------------------------------------------------------------------
-NEORV32_DIR ?= deps/neorv32
-
-.PHONY: check-neorv32-submodule neorv32-submodule-info board-tangnano9k-neorv32-info
-
-check-neorv32-submodule:
-	NEORV32_DIR=$(NEORV32_DIR) ./scripts/check_neorv32_submodule.sh
-
-neorv32-submodule-info: check-neorv32-submodule
-	@echo "NEORV32_DIR=$(NEORV32_DIR)"
-	@git -C $(NEORV32_DIR) status --short || true
-
 board-tangnano9k-neorv32-info:
-	@echo "Tang Nano 9K / NEORV32 Ascon bring-up profile"
-	@echo "  NEORV32_DIR       = $(NEORV32_DIR)"
-	@echo "  ASCON_RTL_DIR     = $(ASCON_RTL_DIR)"
-	@echo "  first accelerator = single XBUS instance"
-	@echo "  first RPC         = 1"
-	@echo "  enc base          = 0xF0000000"
-	@echo "  dec base optional = 0xF0000100"
-	@echo "  next milestone    = minimal NEORV32 VHDL top + UART KAT demo"
+	@echo "Tang Nano 9K NEORV32 bring-up scaffold"
+	@echo "NEORV32_DIR=$${NEORV32_DIR:-deps/neorv32}"
+	@echo "ASCON_RTL_DIR=$(ASCON_RTL_DIR)"
+	@echo "Manifest: hw/neorv32/tang-nano-9k/neorv32_manifest.mk"
+	@echo "Next milestone: instantiate one ascon_aead128_xbus peripheral on NEORV32 XBUS"
