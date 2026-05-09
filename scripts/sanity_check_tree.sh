@@ -31,7 +31,7 @@ for f in \
   doc/phase5_2.md \
   doc/phase5_1.md \
   hw/neorv32/README.md \
-  Makefile .gitignore; do
+  Makefile .gitignore scripts/summarize_gowin_json.py scripts/report_gowin_stats.sh doc/phase5_5a.md; do
   test -f "$f" || { echo "ERROR: missing $f"; exit 1; }
 done
 

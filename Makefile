@@ -249,3 +249,38 @@ synth-tangnano9k-single-yosys:
 
 report-yosys-stats:
 	scripts/report_yosys_stats.sh
+
+# -----------------------------------------------------------------------------
+# Phase 5.5a Gowin-oriented Tang Nano 9K estimates
+# -----------------------------------------------------------------------------
+.PHONY: check-yosys-gowin \
+        synth-tangnano9k-single-gowin \
+        synth-tangnano9k-gowin-matrix \
+        report-gowin-stats
+
+# -----------------------------------------------------------------------------
+# Tang Nano 9K Gowin-oriented accelerator estimates
+# -----------------------------------------------------------------------------
+TANG_DECRYPT ?= 0
+TANG_RPC ?= 1
+
+.PHONY: synth-tangnano9k-single-gowin synth-tangnano9k-gowin-matrix report-gowin-stats check-yosys-gowin
+
+synth-tangnano9k-single-gowin:
+	@mkdir -p build
+	@scripts/run_gowin_synth.sh $(TANG_DECRYPT) $(TANG_RPC)
+
+synth-tangnano9k-gowin-matrix:
+	@$(MAKE) TANG_DECRYPT=0 TANG_RPC=1 synth-tangnano9k-single-gowin
+	@$(MAKE) TANG_DECRYPT=0 TANG_RPC=2 synth-tangnano9k-single-gowin
+	@$(MAKE) TANG_DECRYPT=0 TANG_RPC=4 synth-tangnano9k-single-gowin
+	@$(MAKE) TANG_DECRYPT=1 TANG_RPC=1 synth-tangnano9k-single-gowin
+	@$(MAKE) TANG_DECRYPT=1 TANG_RPC=2 synth-tangnano9k-single-gowin
+
+report-gowin-stats:
+	@scripts/report_gowin_stats.sh
+
+check-yosys-gowin:
+	@yosys -Q -p 'help synth_gowin' >/dev/null
+	@echo "Yosys synth_gowin command is available."
+
