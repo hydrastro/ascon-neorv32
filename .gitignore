@@ -17,6 +17,10 @@
 *.tar.gz
 *~
 
+# Helper scripts downloaded during development
+fix_*.sh
+apply_*.sh
+
 # Nix/direnv local outputs
 /result
 /.direnv/

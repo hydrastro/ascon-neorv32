@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
-IVERILOG ?= iverilog
-VVP      ?= vvp
+IVERILOG  ?= iverilog
+VVP       ?= vvp
 VERILATOR ?= verilator
-YOSYS    ?= yosys
-CC       ?= cc
+YOSYS     ?= yosys
+CC        ?= cc
 
 ASCON_RTL_DIR ?= deps/ascon-rtl
 BUILD_DIR := build
