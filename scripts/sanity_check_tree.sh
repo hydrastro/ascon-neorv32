@@ -52,3 +52,10 @@ if [ ! -f "$ASCON_RTL_DIR/rtl/ascon_aead128_mmio32.v" ]; then
 fi
 
 echo "Sanity check passed: clean ascon-neorv32 tree."
+
+# NEORV32 optional dependency note: this repo can run wrapper-level tests with
+# only deps/ascon-rtl. Board-level work additionally expects deps/neorv32.
+if [ -d deps/neorv32 ] && [ ! -f deps/neorv32/rtl/core/neorv32_top.vhd ]; then
+  echo "ERROR: deps/neorv32 exists but does not look like a NEORV32 checkout" >&2
+  exit 1
+fi

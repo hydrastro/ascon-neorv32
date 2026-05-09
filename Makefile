@@ -190,3 +190,27 @@ synth-tangnano9k-matrix:
 	$(MAKE) TANG_VARIANT=medium synth-tangnano9k-accel
 	$(MAKE) TANG_VARIANT=fast-if-fits synth-tangnano9k-accel
 	$(MAKE) TANG_VARIANT=decrypt-small synth-tangnano9k-accel
+
+# -----------------------------------------------------------------------------
+# PHASE 5.3 NEORV32 SOURCE SCAFFOLD
+# -----------------------------------------------------------------------------
+NEORV32_DIR ?= deps/neorv32
+
+.PHONY: check-neorv32-submodule neorv32-submodule-info board-tangnano9k-neorv32-info
+
+check-neorv32-submodule:
+	NEORV32_DIR=$(NEORV32_DIR) ./scripts/check_neorv32_submodule.sh
+
+neorv32-submodule-info: check-neorv32-submodule
+	@echo "NEORV32_DIR=$(NEORV32_DIR)"
+	@git -C $(NEORV32_DIR) status --short || true
+
+board-tangnano9k-neorv32-info:
+	@echo "Tang Nano 9K / NEORV32 Ascon bring-up profile"
+	@echo "  NEORV32_DIR       = $(NEORV32_DIR)"
+	@echo "  ASCON_RTL_DIR     = $(ASCON_RTL_DIR)"
+	@echo "  first accelerator = single XBUS instance"
+	@echo "  first RPC         = 1"
+	@echo "  enc base          = 0xF0000000"
+	@echo "  dec base optional = 0xF0000100"
+	@echo "  next milestone    = minimal NEORV32 VHDL top + UART KAT demo"
