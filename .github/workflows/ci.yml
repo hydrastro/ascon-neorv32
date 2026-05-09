@@ -21,6 +21,9 @@ jobs:
       - name: Sanity check
         run: ./scripts/sanity_check_tree.sh
 
+      - name: Check NEORV32 submodule
+        run: ./scripts/check_neorv32_submodule.sh
+
       - name: Generate vectors
         run: make vectors
 

@@ -1,7 +1,7 @@
 # Build products
 /build/
 
-# Generated simulation vectors copied from core
+# Generated simulation vectors
 /sim/generated/*.vh
 
 # Simulator outputs
@@ -16,10 +16,6 @@
 *.zip
 *.tar.gz
 *~
-
-# Helper scripts downloaded during development
-fix_*.sh
-apply_*.sh
 
 # Nix/direnv local outputs
 /result
