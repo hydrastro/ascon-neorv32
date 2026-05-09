@@ -7,7 +7,7 @@
 #endif
 
 #ifndef ASCON_ACCEL_DEC_BASE
-#define ASCON_ACCEL_DEC_BASE 0xF0000000u
+#define ASCON_ACCEL_DEC_BASE 0xF0000100u
 #endif
 
 static const uint8_t demo_key[16] = {

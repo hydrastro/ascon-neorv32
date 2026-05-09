@@ -12,13 +12,17 @@ fi
 
 for f in \
   rtl/ascon_aead128_xbus.v \
+  rtl/ascon_aead128_xbus_dual.v \
   sim/tb/tb_ascon_aead128_xbus.v \
+  sim/tb/tb_ascon_aead128_xbus_dual_smoke.v \
   sw/neorv32/ascon_accel.h \
   sw/neorv32/ascon_accel.c \
   sw/neorv32/ascon_accel_demo.c \
   sw/neorv32/README.md \
   doc/phase4_2.md \
   doc/phase4_3.md \
+  doc/phase5_1.md \
+  hw/neorv32/README.md \
   Makefile .gitignore; do
   test -f "$f" || { echo "ERROR: missing $f"; exit 1; }
 done

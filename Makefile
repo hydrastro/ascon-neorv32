@@ -28,22 +28,28 @@ CORE_RTL_FILES := \
 	$(ASCON_RTL_DIR)/rtl/ascon_aead128_buffered.v \
 	$(ASCON_RTL_DIR)/rtl/ascon_aead128_mmio32.v
 
-RTL_FILES := $(CORE_RTL_FILES) $(RTL_DIR)/ascon_aead128_xbus.v
+NEORV32_RTL_FILES := \
+	$(RTL_DIR)/ascon_aead128_xbus.v \
+	$(RTL_DIR)/ascon_aead128_xbus_dual.v
+
+RTL_FILES := $(CORE_RTL_FILES) $(NEORV32_RTL_FILES)
 TB_XBUS_FILE := $(TB_DIR)/tb_ascon_aead128_xbus.v
+TB_XBUS_DUAL_FILE := $(TB_DIR)/tb_ascon_aead128_xbus_dual_smoke.v
 VEC_AEAD_AD_FILE := $(GEN_DIR)/ascon_aead128_ad_vectors.vh
 IVFLAGS := -g2005-sv -I$(GEN_DIR) -I$(ASCON_RTL_DIR)/rtl -I$(RTL_DIR)
 
 .PHONY: all sim sim-xbus-iverilog \
 	sim-xbus-enc-rpc1 sim-xbus-enc-rpc2 sim-xbus-enc-rpc4 sim-xbus-enc-rpc8 \
 	sim-xbus-dec-rpc1 sim-xbus-dec-rpc2 sim-xbus-dec-rpc4 sim-xbus-dec-rpc8 \
-	vectors lint-verilator synth-xbus-yosys \
+	sim-xbus-dual-smoke \
+	vectors lint-verilator synth-xbus-yosys synth-xbus-dual-yosys \
 	synth-xbus-enc-rpc1 synth-xbus-enc-rpc2 synth-xbus-enc-rpc4 synth-xbus-enc-rpc8 \
 	synth-xbus-dec-rpc1 synth-xbus-dec-rpc2 synth-xbus-dec-rpc4 synth-xbus-dec-rpc8 \
 	sw-host-check sanity check-core clean
 
 all: sim
 
-sim: sim-xbus-iverilog
+sim: sim-xbus-iverilog sim-xbus-dual-smoke
 
 sanity:
 	./scripts/sanity_check_tree.sh
@@ -65,6 +71,9 @@ $(VEC_AEAD_AD_FILE): check-core | $(GEN_DIR)
 	cp $(ASCON_RTL_DIR)/sim/generated/ascon_aead128_ad_vectors.vh $@
 
 sim-xbus-iverilog: sim-xbus-enc-rpc1 sim-xbus-enc-rpc2 sim-xbus-enc-rpc4 sim-xbus-enc-rpc8 sim-xbus-dec-rpc1 sim-xbus-dec-rpc2 sim-xbus-dec-rpc4 sim-xbus-dec-rpc8
+
+sim-xbus-dual-smoke: $(BUILD_DIR)/tb_ascon_aead128_xbus_dual_smoke.vvp
+	$(VVP) $<
 
 sim-xbus-enc-rpc1: $(BUILD_DIR)/tb_ascon_aead128_xbus_enc_rpc1.vvp
 	$(VVP) $<
@@ -100,10 +109,14 @@ $(BUILD_DIR)/tb_ascon_aead128_xbus_dec_rpc4.vvp: $(RTL_FILES) $(TB_XBUS_FILE) $(
 $(BUILD_DIR)/tb_ascon_aead128_xbus_dec_rpc8.vvp: $(RTL_FILES) $(TB_XBUS_FILE) $(VEC_AEAD_AD_FILE) | $(BUILD_DIR)
 	$(IVERILOG) $(IVFLAGS) -P tb_ascon_aead128_xbus.DECRYPT=1 -P tb_ascon_aead128_xbus.RPC=8 -o $@ $(TB_XBUS_FILE) $(RTL_FILES)
 
+$(BUILD_DIR)/tb_ascon_aead128_xbus_dual_smoke.vvp: $(RTL_FILES) $(TB_XBUS_DUAL_FILE) | $(BUILD_DIR)
+	$(IVERILOG) $(IVFLAGS) -o $@ $(TB_XBUS_DUAL_FILE) $(RTL_FILES)
+
 lint-verilator:
 	$(VERILATOR) --lint-only --timing -Wall -I$(GEN_DIR) -I$(ASCON_RTL_DIR)/rtl -I$(RTL_DIR) --top-module ascon_aead128_xbus $(RTL_FILES)
+	$(VERILATOR) --lint-only --timing -Wall -I$(GEN_DIR) -I$(ASCON_RTL_DIR)/rtl -I$(RTL_DIR) --top-module ascon_aead128_xbus_dual $(RTL_FILES)
 
-synth-xbus-yosys: synth-xbus-enc-rpc1 synth-xbus-enc-rpc2 synth-xbus-enc-rpc4 synth-xbus-enc-rpc8 synth-xbus-dec-rpc1 synth-xbus-dec-rpc2 synth-xbus-dec-rpc4 synth-xbus-dec-rpc8
+synth-xbus-yosys: synth-xbus-enc-rpc1 synth-xbus-enc-rpc2 synth-xbus-enc-rpc4 synth-xbus-enc-rpc8 synth-xbus-dec-rpc1 synth-xbus-dec-rpc2 synth-xbus-dec-rpc4 synth-xbus-dec-rpc8 synth-xbus-dual-yosys
 
 synth-xbus-enc-rpc1: | $(BUILD_DIR)
 	$(YOSYS) -p 'read_verilog -sv $(RTL_FILES); chparam -set DECRYPT 0 ascon_aead128_xbus; chparam -set ROUNDS_PER_CYCLE 1 ascon_aead128_xbus; synth -top ascon_aead128_xbus; stat -top ascon_aead128_xbus' > $(BUILD_DIR)/yosys_xbus_enc_stat_rpc1.txt
@@ -129,6 +142,10 @@ synth-xbus-dec-rpc4: | $(BUILD_DIR)
 synth-xbus-dec-rpc8: | $(BUILD_DIR)
 	$(YOSYS) -p 'read_verilog -sv $(RTL_FILES); chparam -set DECRYPT 1 ascon_aead128_xbus; chparam -set ROUNDS_PER_CYCLE 8 ascon_aead128_xbus; synth -top ascon_aead128_xbus; stat -top ascon_aead128_xbus' > $(BUILD_DIR)/yosys_xbus_dec_stat_rpc8.txt
 	cat $(BUILD_DIR)/yosys_xbus_dec_stat_rpc8.txt
+
+synth-xbus-dual-yosys: | $(BUILD_DIR)
+	$(YOSYS) -p 'read_verilog -sv $(RTL_FILES); chparam -set ROUNDS_PER_CYCLE 8 ascon_aead128_xbus_dual; synth -top ascon_aead128_xbus_dual; stat -top ascon_aead128_xbus_dual' > $(BUILD_DIR)/yosys_xbus_dual_stat_rpc8.txt
+	cat $(BUILD_DIR)/yosys_xbus_dual_stat_rpc8.txt
 
 sw-host-check: | $(BUILD_DIR)
 	$(CC) -std=c99 -Wall -Wextra -Werror -I$(SW_DIR) -c $(SW_DIR)/ascon_accel.c -o $(BUILD_DIR)/ascon_accel.o
