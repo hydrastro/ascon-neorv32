@@ -1,0 +1,195 @@
+[user@nixos ~/.../wscon/ascon-neorv32 (master)]$ make synth-tangnano9k-gowin-matrix
+make[1]: Entering directory '/home/user/Documents/git/wscon/ascon-neorv32'
+Running Gowin-oriented Yosys synthesis: DECRYPT=0 RPC=1
+Wrote build/gowin_tangnano9k_single_dec0_rpc1.txt
+Wrote build/gowin_tangnano9k_single_dec0_rpc1.json
+make[1]: Leaving directory '/home/user/Documents/git/wscon/ascon-neorv32'
+make[1]: Entering directory '/home/user/Documents/git/wscon/ascon-neorv32'
+Running Gowin-oriented Yosys synthesis: DECRYPT=0 RPC=2
+
+Wrote build/gowin_tangnano9k_single_dec0_rpc2.txt
+Wrote build/gowin_tangnano9k_single_dec0_rpc2.json
+make[1]: Leaving directory '/home/user/Documents/git/wscon/ascon-neorv32'
+make[1]: Entering directory '/home/user/Documents/git/wscon/ascon-neorv32'
+Running Gowin-oriented Yosys synthesis: DECRYPT=0 RPC=4
+
+
+Wrote build/gowin_tangnano9k_single_dec0_rpc4.txt
+Wrote build/gowin_tangnano9k_single_dec0_rpc4.json
+make[1]: Leaving directory '/home/user/Documents/git/wscon/ascon-neorv32'
+make[1]: Entering directory '/home/user/Documents/git/wscon/ascon-neorv32'
+Running Gowin-oriented Yosys synthesis: DECRYPT=1 RPC=1
+Wrote build/gowin_tangnano9k_single_dec1_rpc1.txt
+Wrote build/gowin_tangnano9k_single_dec1_rpc1.json
+make[1]: Leaving directory '/home/user/Documents/git/wscon/ascon-neorv32'
+make[1]: Entering directory '/home/user/Documents/git/wscon/ascon-neorv32'
+Running Gowin-oriented Yosys synthesis: DECRYPT=1 RPC=2
+
+Wrote build/gowin_tangnano9k_single_dec1_rpc2.txt
+Wrote build/gowin_tangnano9k_single_dec1_rpc2.json
+make[1]: Leaving directory '/home/user/Documents/git/wscon/ascon-neorv32'
+[user@nixos ~/.../wscon/ascon-neorv32 (master)]$ make report-gowin-stats
+=== build/gowin_tangnano9k_single_dec0_rpc1.json ===
+file: build/gowin_tangnano9k_single_dec0_rpc1.json
+total_cells: 13221
+lut_like: 7047
+ff_like: 4420
+carry_alu_like: 185
+memory_like: 0
+io_like: 108
+top_cell_types:
+  DFFCE: 4321
+  LUT4: 3723
+  LUT3: 1623
+  MUX2_LUT5: 1500
+  LUT2: 973
+  LUT1: 543
+  ALU: 185
+  DFFC: 99
+  IBUF: 73
+  $specify2: 57
+  OBUF: 35
+  $specrule: 33
+  MUX2_LUT6: 26
+  $scopeinfo: 13
+  MUX2_LUT7: 8
+  $specify3: 5
+  MUX2_LUT8: 2
+  VCC: 1
+  GND: 1
+Found and reported 0 problems.
+Found and reported 0 problems.
+Found and reported 0 problems.
+Warnings: 2 unique messages, 4 total
+
+=== build/gowin_tangnano9k_single_dec0_rpc2.json ===
+file: build/gowin_tangnano9k_single_dec0_rpc2.json
+total_cells: 18932
+lut_like: 10467
+ff_like: 4420
+carry_alu_like: 188
+memory_like: 0
+io_like: 108
+top_cell_types:
+  LUT4: 5439
+  DFFCE: 4321
+  MUX2_LUT5: 2875
+  LUT3: 2670
+  LUT2: 1557
+  MUX2_LUT6: 680
+  LUT1: 613
+  MUX2_LUT7: 200
+  ALU: 188
+  DFFC: 99
+  IBUF: 73
+  MUX2_LUT8: 71
+  $specify2: 57
+  OBUF: 35
+  $specrule: 33
+  $scopeinfo: 14
+  $specify3: 5
+  VCC: 1
+  GND: 1
+Found and reported 0 problems.
+Found and reported 0 problems.
+Found and reported 0 problems.
+Warnings: 2 unique messages, 4 total
+
+=== build/gowin_tangnano9k_single_dec0_rpc4.json ===
+file: build/gowin_tangnano9k_single_dec0_rpc4.json
+total_cells: 33708
+lut_like: 19246
+ff_like: 4420
+carry_alu_like: 188
+memory_like: 0
+io_like: 108
+top_cell_types:
+  LUT4: 11009
+  MUX2_LUT5: 6413
+  DFFCE: 4321
+  LUT3: 4139
+  LUT2: 2567
+  MUX2_LUT6: 2224
+  LUT1: 1343
+  MUX2_LUT7: 886
+  MUX2_LUT8: 298
+  ALU: 188
+  DFFC: 99
+  IBUF: 73
+  $specify2: 57
+  OBUF: 35
+  $specrule: 33
+  $scopeinfo: 16
+  $specify3: 5
+  VCC: 1
+  GND: 1
+Found and reported 0 problems.
+Found and reported 0 problems.
+Found and reported 0 problems.
+Warnings: 2 unique messages, 4 total
+
+=== build/gowin_tangnano9k_single_dec1_rpc1.json ===
+file: build/gowin_tangnano9k_single_dec1_rpc1.json
+total_cells: 13503
+lut_like: 7117
+ff_like: 4293
+carry_alu_like: 185
+memory_like: 0
+io_like: 108
+top_cell_types:
+  DFFCE: 4194
+  LUT4: 3562
+  MUX2_LUT5: 1758
+  LUT3: 1569
+  LUT2: 1267
+  LUT1: 534
+  ALU: 185
+  MUX2_LUT6: 105
+  DFFC: 99
+  IBUF: 73
+  $specify2: 57
+  OBUF: 35
+  $specrule: 33
+  $scopeinfo: 13
+  MUX2_LUT7: 9
+  $specify3: 5
+  MUX2_LUT8: 3
+  VCC: 1
+  GND: 1
+Found and reported 0 problems.
+Found and reported 0 problems.
+Found and reported 0 problems.
+Warnings: 2 unique messages, 4 total
+
+=== build/gowin_tangnano9k_single_dec1_rpc2.json ===
+file: build/gowin_tangnano9k_single_dec1_rpc2.json
+total_cells: 18114
+lut_like: 10152
+ff_like: 4293
+carry_alu_like: 188
+memory_like: 0
+io_like: 108
+top_cell_types:
+  LUT4: 5470
+  DFFCE: 4194
+  MUX2_LUT5: 2625
+  LUT3: 2454
+  LUT2: 1587
+  MUX2_LUT6: 609
+  LUT1: 453
+  ALU: 188
+  MUX2_LUT7: 165
+  DFFC: 99
+  IBUF: 73
+  $specify2: 57
+  MUX2_LUT8: 51
+  OBUF: 35
+  $specrule: 33
+  $scopeinfo: 14
+  $specify3: 5
+  VCC: 1
+  GND: 1
+Found and reported 0 problems.
+Found and reported 0 problems.
+Found and reported 0 problems.
+Warnings: 2 unique messages, 4 total
